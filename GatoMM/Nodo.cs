@@ -14,7 +14,52 @@ namespace GatoMM
 
         public List<Nodo> Hijos { get; set; } = null;
 
-        private int[,] lineas
+        /// <summary>
+        /// Genera la lista de hijos para el objeto Nodo actual 
+        /// </summary>
+        /// <param name="turno">Indica si es turno de X u O</param>
+        /// <param name="profundidad">Indica la profundidad actual</param>
+        int GenerarHijos(char turno, bool estaMaximizando, int profundidad = 4)
+        {
+            for(int i = 0; i < 9; i++)
+            {
+                if (Estado[i]==' ')
+                {
+                    Nodo hijo = new Nodo();
+                    hijo.Estado=new char[9];
+                    hijo.Estado = (char[])Estado.Clone();
+                    hijo.Estado[i] = turno;
+                    if (Hijos==null) Hijos = new List<Nodo>();
+                    Hijos.Add(hijo);
+                }
+            }
+            if (profundidad > 0)
+            {
+                char t = (turno == 'X') ? 'O' : 'X';
+                foreach (Nodo hijo in Hijos)
+                {
+                    if (!hijo.Gana(turno))
+                        hijo.GenerarHijos(t, !estaMaximizando, profundidad -1 );
+                }
+            }
+            else
+            {
+                foreach (Nodo hijo in Hijos)
+                {
+                    hijo.CalcularValor();
+                }
+            }
+            if (!estaMaximizando)
+            {
+                return Hijos.Max(h => h.Valor.Value);
+            }
+            else
+            {
+                return Hijos.Min(h => h.Valor.Value);
+            }
+        }
+
+        private readonly int[,] lineas
             = new int[,]
             {
                 {0,1,2 },
